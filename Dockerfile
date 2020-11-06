@@ -16,28 +16,52 @@ RUN set -ex \
     && yum -y install \
        wget \
        bzip2 \
+       bzip2-devel \
        perl \
        gcc \
        gcc-c++\
        git \
        gnupg \
+       libffi-devel \
        make \
        munge \
        munge-devel \
        python-devel \
        python-pip \
-       python34 \
-       python34-devel \
-       python34-pip \
+       python36 \
+       python36-devel \
+       python36-pip \
        mariadb-server \
        mariadb-devel \
+       openssl-devel \
        psmisc \
        bash-completion \
        vim-enhanced \
     && yum clean all \
     && rm -rf /var/cache/yum
 
-RUN pip install Cython nose && pip3.4 install Cython nose
+RUN pip install Cython nose && pip3.6 install Cython nose
+
+RUN set -x \
+    && yum -y install centos-release-scl \
+    && yum -y install devtoolset-8-gcc devtoolset-8-gcc-c++ \
+    && source scl_source enable devtoolset-8 \
+    && scl enable devtoolset-8 -- bash
+
+RUN echo "source scl_source enable devtoolset-8" >> /root/.bashrc \
+    && cat /root/.bashrc
+
+RUN set -x \
+    && wget -q https://www.python.org/ftp/python/3.8.5/Python-3.8.5.tgz \
+    && tar xf Python-3.8.5.tgz \
+    && pushd Python-3.8.5 \
+    && source scl_source enable devtoolset-8 \
+    && gcc --version \
+    && ./configure --enable-optimizations --prefix=/usr/local \
+    && make && make install \
+    && popd \
+    && python3 --version \
+    && rm -Rf Python-3.8.5{,.tgz}
 
 RUN set -ex \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64" \

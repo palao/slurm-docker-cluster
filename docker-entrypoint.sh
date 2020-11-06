@@ -23,6 +23,9 @@ fi
 
 if [ "$1" = "slurmctld" ]
 then
+    echo "---> Installing FrUCToSA"
+    /usr/local/bin/pip3.8 install /FrUCToSA
+
     echo "---> Starting the MUNGE Authentication service (munged) ..."
     gosu munge /usr/sbin/munged
 
